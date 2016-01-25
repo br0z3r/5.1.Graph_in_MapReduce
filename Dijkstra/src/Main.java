@@ -80,7 +80,7 @@ public class Main {
 
         for (int i = 0; i < countArcs; i++) {
             line = bufferedReader.readLine();
-            if(line == null || !line.isEmpty()) {
+            if(line == null || line.isEmpty()) {
                 continue;
             }
 
@@ -90,6 +90,13 @@ public class Main {
             weigth =   new Integer(st.nextToken());
 
             tmpValue = graph.get(node);
+            if(tmpValue.containsKey(destNode)){
+                if(tmpValue.get(destNode)<weigth) {
+                    tmpValue.put(destNode,weigth);
+                } else {
+                    continue;
+                }
+            }
             tmpValue.put(destNode,weigth);
         }
     }
@@ -108,5 +115,5 @@ public class Main {
 
         return result;
     }
-    
+
 }

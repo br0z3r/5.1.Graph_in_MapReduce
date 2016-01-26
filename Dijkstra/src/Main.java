@@ -14,7 +14,7 @@ public class Main {
      * {visitedNode} - посещенные узлы
      */
     private static HashMap<Integer,Integer> distance = new HashMap<>();
-    private static  ArrayList<Integer> visitedNode = new ArrayList<>();
+    private static ArrayList<Integer> visitedNode = new ArrayList<>();
     private static HashMap<Integer, HashMap<Integer,Integer>> graph = new HashMap<>();
     private static  Integer baseNode, destNode;
 
@@ -22,13 +22,14 @@ public class Main {
     public static void main(String[] args) throws IOException {
         InputStream stdin = null;
         stdin = System.in;
-        FileInputStream stream = new FileInputStream("/home/air/IdeaProjects/BigData/5.Algorithms_on_graph_MapReduce/5.1.Graph_in_MapReduce/Dijkstra/test");
+        FileInputStream stream = new FileInputStream("/home/air/IdeaProjects/BigData/5.Algorithms_on_graph_MapReduce/5.1.Graph_in_MapReduce/Dijkstra/test2");
         System.setIn(stream);
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         readTask(bufferedReader);
         System.out.println(baseNode);
         System.out.println(destNode);
+        System.out.println(getDistance(baseNode,destNode));
 
     }
 
@@ -66,7 +67,7 @@ public class Main {
 
         StringTokenizer st;
         String line;
-        Integer node , destNode ,weigth;
+        Integer node , destNode ,weight;
 
         HashMap<Integer,Integer> tmpValue;
 
@@ -87,33 +88,83 @@ public class Main {
             st = new StringTokenizer(line);
             node = new Integer(st.nextToken());
             destNode = new Integer(st.nextToken());
-            weigth =   new Integer(st.nextToken());
+            weight =   new Integer(st.nextToken());
 
             tmpValue = graph.get(node);
             if(tmpValue.containsKey(destNode)){
-                if(tmpValue.get(destNode)<weigth) {
-                    tmpValue.put(destNode,weigth);
+                if(tmpValue.get(destNode)<weight) {
+                    tmpValue.put(destNode,weight);
                 } else {
                     continue;
                 }
             }
-            tmpValue.put(destNode,weigth);
+            tmpValue.put(destNode,weight);
         }
     }
 
-    private static HashMap<Integer,Integer> getDistance(HashMap<Integer,HashMap<Integer,Integer>>graph,
-                                                        Integer node, Integer offset) {
+    private static void optimizeDistance(Integer node, Integer offset) {
 
-        HashMap<Integer,Integer>result = new HashMap<>();
+        Integer tmpNode, tmpDistance;
+
         if(!graph.containsKey(node)) {
-            return null;
+            return ;
         }
-
         for (Map.Entry<Integer,Integer> key:graph.get(node).entrySet()) {
-            result.put(key.getKey(),key.getValue() + offset);
+            tmpNode = key.getKey();
+            tmpDistance =key.getValue() + offset;
+            if(!distance.containsKey(tmpNode) || distance.get(tmpNode)> tmpDistance){
+                distance.put(tmpNode,tmpDistance);
+            }
         }
 
+    }
+
+    private static Integer getMinUnvisited() {
+        Integer result = -1;
+        Integer minDistance = Integer.MAX_VALUE;
+        Integer tmpNode, tmpDistance;
+
+        for (Map.Entry<Integer,Integer> key:distance.entrySet()) {
+            tmpNode = key.getKey();
+            tmpDistance = key.getValue();
+            if(minDistance > tmpDistance && graph.containsKey(tmpNode)) {
+                result = tmpNode;
+                minDistance = tmpDistance;
+            }
+        }
+//        System.out.println("getMinUnvisited() =" + minDistance + " node = " + result);
         return result;
     }
+
+    private static void removeNode(Integer node) {
+        if(!graph.containsKey(node)) {
+            return;
+        }
+        graph.remove(node).clear();
+
+    }
+
+    private static int getDistance(Integer startNode, Integer finishNode) {
+        Integer pathLength = -1;
+
+        Integer visitedNode = startNode;
+        Integer offset = graph.get(startNode).get(startNode);
+        optimizeDistance(startNode,offset);
+        removeNode(startNode);
+
+        while (visitedNode.compareTo(finishNode)!=0 && (visitedNode = getMinUnvisited())>0) {
+            offset = distance.get(visitedNode);
+            optimizeDistance(visitedNode,offset);
+            removeNode(visitedNode);
+        }
+
+        if(distance.containsKey(finishNode)) {
+            pathLength = distance.get(finishNode).intValue();
+        }
+
+        return pathLength;
+    }
+
+
 
 }

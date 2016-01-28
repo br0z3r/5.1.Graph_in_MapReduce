@@ -22,7 +22,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         InputStream stdin = null;
         stdin = System.in;
-        FileInputStream stream = new FileInputStream("/home/air/IdeaProjects/BigData/5.Algorithms_on_graph_MapReduce/5.1.Graph_in_MapReduce/Dijkstra/test2");
+        FileInputStream stream = new FileInputStream("/<path>/test2");
         System.setIn(stream);
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
